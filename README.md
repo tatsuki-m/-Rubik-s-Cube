@@ -14,3 +14,15 @@ vvp ./a.out
 # simulate
 gtkwave top_test.vcd
 ```
+
+# Correspondence table
+
+
+# Bass name
+
+Refer to this photo when you connect each component.
+
+Please refer to [top.v](https://github.com/tatsuki-m/Rubik-s-Cube/blob/master/top.v)
+
+In this file, I name each bass so as not ot cause conflict in the circuit
+
