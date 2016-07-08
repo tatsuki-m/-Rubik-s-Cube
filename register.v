@@ -1,8 +1,9 @@
-module register(src0, src1, dst, we, data, clk, rst_n, data0, data1);
+module register(src0, src1, dst, we, data, clk, rst_n, data0, data1,blue,white,red);
 	input wire clk, rst_n, we;
 	input wire [3:0] src0, src1;
 	input wire [3:0] dst;
 	input wire [23:0] data;
+	input wire [23:0] blue, white,red;
 	output wire [23:0] data0, data1;
 	wire [23:0] reg0, reg1, reg2, reg3, reg4, reg5, reg6, reg7, reg8, reg9, reg10, reg11;
 	reg [23:0] regis [15:0]; // depend on algorism
@@ -20,9 +21,9 @@ always @(posedge clk) begin
 	// rst_n 1 => はいらない
 if (!rst_n) begin
 // initial state
-		regis[0] <= BLUE;
-		regis[1] <= WHITE;
-		regis[2] <= RED;
+		regis[0] <= blue;
+		regis[1] <= white;
+		regis[2] <= red;
 // temp state
 		regis[3] <= 0;
 		regis[4] <= 0;
