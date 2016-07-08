@@ -4,7 +4,8 @@ module register(src0, src1, dst, we, data, clk, rst_n, data0, data1);
 	input wire [3:0] dst;
 	input wire [23:0] data;
 	output wire [23:0] data0, data1;
-	wire [23:0] reg0, reg1, reg2, reg3, reg4, reg5, reg6, reg7, reg8, reg9, reg10, reg11;
+	wire [23:0] reg0, reg1, reg2, reg3, reg4, reg5, reg6, reg7, reg8, reg9, reg10, reg11,
+				reg12, reg13, reg14;
 	reg [23:0] regis [15:0]; // depend on algorism
 
 	parameter [23:0] BLUE = 24'b1000_0000_0000_0000_1100_0001,
@@ -63,6 +64,9 @@ assign reg8 = regis[8];
 assign reg9 = regis[9];
 assign reg10 = regis[10];
 assign reg11 = regis[11];
+assign reg12 = regis[12];
+assign reg13 = regis[13];
+assign reg14 = regis[14];
 
 endmodule
 
