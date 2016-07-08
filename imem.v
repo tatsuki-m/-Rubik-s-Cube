@@ -17,7 +17,9 @@ parameter [2:0]	INC_NUM = 3'b001;
 // mem addr
 parameter [3:0]	BLUE_MEM_ADDR	= 4'b0000,
 				WHITE_MEM_ADDR	= 4'b0001,
-				RED_MEM_ADDR	= 4'b0010;
+				RED_MEM_ADDR	= 4'b0010,
+				ORDER1_MEM_ADDR = 4'b0011,
+				ORDER2_MEM_ADDR = 4'b0100;
 
 // define order num
 parameter [7:0] TO_INIT 		  = 0,
@@ -36,7 +38,12 @@ parameter [7:0] TO_INIT 		  = 0,
 				TO_WHITE_CHECK	  = 63,
 				TO_RED_CHECK	  = 66,
 				TO_OVERWRITE_STATE = 69,
-				TO_FIN			   = 75;
+				TO_FIN			   = 77,
+				TO_INIT_2		  = 78,
+				TO_SWITCH_BY_ORDER2 = 82,
+				TO_GO_STAGE_2	  = 89,
+				TO_RETURN_STAGE_1 = 94;
+				
 
 always @(pc) begin
 	case (pc)
@@ -83,7 +90,7 @@ always @(pc) begin
 	5: begin
 		op[15:12]	<= JNZ;
 		op[11:8] 	<= 4'bx;
-		op[7:0]		<= TO_MAKE_SEQUENCE; 
+		op[7:0]		<= TO_SWITCH_BY_ORDER2; 
 	end
 
 // save an order(3bit)
@@ -663,11 +670,185 @@ r	op[3:0]	  <= 4'bx  // DC
 		op[3:0]		<= 4'bx;
 	end 
 
-	75: begin
+	75 : begin
+		op[15:12]	<= STORE;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:4]		<= ORDER1_MEM_ADDR;
+		op[3:0]		<= 4'bx;
+	end 
+
+	76 : begin
+		op[15:12]	<= STORE;
+		op[11:8]	<= ORDER2_ADDR;
+		op[7:4]		<= ORDER2_MEM_ADDR;
+		op[3:0]		<= 4'bx;
+	end 
+
+	77: begin
 		op[15:12]	<= JMP;
 		op[11:8]	<= 4'bx;
 		op[7:0]		<= TO_FIN;
 	end
+
+// ============================
+// ========== Init 2 ==========
+// ============================
+	
+	78: begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= TMP_BLUE_ADDR;
+		op[7:4]		<= BLUE_ADDR_2;
+		op[3:0]		<= 4'bx;
+	end
+
+	79: begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= TMP_WHITE_ADDR;
+		op[7:4]		<= WHITE_ADDR_2;
+		op[3:0]		<= 4'bx;
+	end
+
+	80: begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= TMP_RED_ADDR;
+		op[7:4]		<= RED_ADDR_2;
+		op[3:0]		<= 4'bx;
+	end
+
+	81: begin
+		op[15:12]	<= JMP;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_READING_ORDER;
+	end
+
+// ===========================
+// ==== Switch by order2 =====
+// ===========================
+
+	82: begin
+		op[15:12]	<= CHECK;
+		op[11:8]	<= ORDER2_ADDR;
+		op[7:0]		<= {8'b0000_0000};
+	end
+
+	83: begin
+		op[15:12]	<= JNZ;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_GO_STAGE_2;
+	end
+
+// =====================================
+// ========== Make Sequence 2 ==========
+// =====================================
+
+	84: begin
+		op[15:12]	<= ADD;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:4]		<= ORDER1_ADDR;
+		op[3:0]		<= {INC_NUM, SEQUENCE_INC_FLAG};
+	end
+
+	85: begin
+		op[15:12]	<= CHECK;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:0]		<= {8'b0000_0000};
+	end
+
+	86: begin
+		op[15:12]	<= JNZ;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_RETURN_STAGE_1;
+	end
+	
+	87 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:4]		<= ORDER1_ADDR;
+		op[3:0]		<= {INIT_ROTATION_FLAG, 3'b000};
+	end
+
+	88	: begin
+		op[15:12]	<= JMP;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_INIT_2;
+	end
+
+// ================================
+// ========== Go Stage 2 ==========
+// ================================
+
+	89 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= ORDER2_ADDR;
+		op[7:4]		<= ORDER1_ADDR;
+		op[3:0]		<= 4'bx;
+	end
+
+	90 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= BLUE_ADDR_2;
+		op[7:4]		<= TMP_BLUE_ADDR;
+		op[3:0]		<= 4'bx;
+	end
+
+	91 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= WHITE_ADDR_2;
+		op[7:4]		<= TMP_WHITE_ADDR;
+		op[3:0]		<= 4'bx;
+	end
+
+	92 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= RED_ADDR_2;
+		op[7:4]		<= TMP_RED_ADDR;
+		op[3:0]		<= 4'bx;
+	end
+
+	93	: begin
+		op[15:12]	<= JMP;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_INIT_2;
+	end
+
+// ====================================
+// ========== Return Stage 1 ==========
+// ====================================
+
+	94: begin
+		op[15:12]	<= ADD;
+		op[11:8]	<= ORDER2_ADDR;
+		op[7:4]		<= ORDER2_ADDR;
+		op[3:0]		<= {INC_NUM, SEQUENCE_INC_FLAG};
+	end
+
+	95 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:4]		<= ORDER2_ADDR;
+		op[3:0]		<= 4'bx;
+	end
+
+	96 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= ORDER1_ADDR;
+		op[7:4]		<= ORDER1_ADDR;
+		op[3:0]		<= {INIT_ROTATION_FLAG, 3'b000};
+	end
+
+	97 : begin
+		op[15:12]	<= COPY;
+		op[11:8]	<= ORDER2_ADDR;
+		op[7:4]		<= ORDER2_ADDR;
+		op[3:0]		<= {INIT_ROTATION_FLAG, 3'b000};
+	end
+
+	98	: begin
+		op[15:12]	<= JMP;
+		op[11:8]	<= 4'bx;
+		op[7:0]		<= TO_INIT;
+	end
+
 	endcase
 end 
 
