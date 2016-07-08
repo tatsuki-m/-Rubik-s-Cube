@@ -1,5 +1,6 @@
-module top(clk, rst_n);
+module top(clk, rst_n,blue,white,red);
 	input wire clk, rst_n;
+	input wire [23:0] blue,white,red;
 	// write enable
 	input wire pc_we, reg_we, mem_we;
 
@@ -34,7 +35,7 @@ sel s1(.in0(dec_data), .in1(reg_data0), .sel(sel1), .out(sel1_out));
 sel s2(.in0(alu_out), .in1(mem_data), .sel(sel2), .out(sel2_out));
 
 // register
-register r0(.src0(src0), .src1(src1), .dst(dst), .we(reg_we), .data(sel2_out), .clk(clk), .rst_n(rst_n), .data0(reg_data0), .data1(reg_data1));
+register r0(.src0(src0), .src1(src1), .dst(dst), .we(reg_we), .data(sel2_out), .clk(clk), .rst_n(rst_n), .data0(reg_data0), .data1(reg_data1),.blue(blue), .white(white), .red(red));
 
 // alu
 alu a0(.ina(sel1_out), .inb(reg_data1), .op(alu_op), .zf(zf), .out(alu_out));
